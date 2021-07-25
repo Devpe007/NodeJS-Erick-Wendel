@@ -47,47 +47,78 @@ function getLocation(id_user, callback) {
     }, 2000);
 };
 
-const userPromise = getUser();
+main();
 
-// Para manipular o sucesso usamos a função .then()
-// Para manipular error usamos o .catch()
+// 1- Adicionar a palavra async -> automaticamento elá retornará uma Promise
+async function main() {
+    try {
+        console.time('medida-promise');
 
-// Usuario -> telefone -> telefone
+        const user = await getUser();
+        // const number = await getNumber(user.id);
+        // const location = await getLocationAsync(user.id);
 
-userPromise
-    .then((user) => {
-        return getNumber(user.id)
-        .then(function resolveNumber(result) {
-            return {
-                user: {
-                    name: user.name,
-                    id: user.id,
-                },
-                number: result,
-            }
-        });
-    })
-    .then((resultado) => {
-        const location = getLocationAsync(resultado.user.id);
+        const result = await Promise.all([
+            getNumber(user.id),
+            getLocationAsync(user.id),
+        ]);
 
-        return location.then(function resolveLocation(result) {
-            return {
-                user: resultado.user,
-                number: resultado.number,
-                location: result,
-            }
-        });
-    })
-    .then((result) => {
+        const location = result[1];
+        const number = result[0];
+
         console.log(`
-            Name: ${result.user.name}
-            Location: ${result.location.rua}, ${result.location.numero}
-            Number: (${result.number.ddd}) ${result.number.number}
+            Name: ${user.name}
+            Number: (${number.ddd}) ${number.number}
+            Location: ${location.rua} ${location.numero}
         `);
-    })
-    .catch((error) => {
+
+        console.timeEnd('medida-promise');
+    } catch(error) {
         console.error('DEU RUIM', error);
-    });
+    };
+};
+
+// const userPromise = getUser();
+
+// // Para manipular o sucesso usamos a função .then()
+// // Para manipular error usamos o .catch()
+
+// // Usuario -> telefone -> telefone
+
+// userPromise
+//     .then((user) => {
+//         return getNumber(user.id)
+//         .then(function resolveNumber(result) {
+//             return {
+//                 user: {
+//                     name: user.name,
+//                     id: user.id,
+//                 },
+//                 number: result,
+//             }
+//         });
+//     })
+//     .then((resultado) => {
+//         const location = getLocationAsync(resultado.user.id);
+
+//         return location.then(function resolveLocation(result) {
+//             return {
+//                 user: resultado.user,
+//                 number: resultado.number,
+//                 location: result,
+//             }
+//         });
+//     })
+//     .then((result) => {
+//         console.log(`
+//             Name: ${result.user.name}
+//             Location: ${result.location.rua}, ${result.location.numero}
+//             Number: (${result.number.ddd}) ${result.number.number}
+//         `);
+//     })
+//     .catch((error) => {
+//         console.error('DEU RUIM', error);
+//     });
 
 // getUser(function resolveUser(error, user) {
 //     // null || "" || 0 === false
