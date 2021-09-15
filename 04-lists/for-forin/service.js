@@ -5,7 +5,7 @@ const URL = `https://swapi.dev/api/people`;
 async function getPeople(name) {
     const url = `${URL}/?search=${name}&format=json`;
 
-    const response = await axios.get(url);
+    const response = await axios.default.get(url);
 
     return response.data;
 };
